@@ -1,9 +1,9 @@
-name: Checkov and Terraform
+name: 'Checkov Validation And Terraform Deploy To Cloud'
 
 on:
   push:
-    branches:
-      - master
+    branches: [ "master" ]
+  pull_request:
 
 
 jobs:
