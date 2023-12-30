@@ -1,0 +1,60 @@
+name: Checkov and Terraform
+
+on:
+  push:
+    branches:
+      - master
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Install Checkov
+        run: pip3 install checkov 
+
+      - name: Check Terraform with Checkov
+        run: checkov -f main.tf --quiet -o json --output-file-path checkov_result/ 
+        
+      - name: Check Terraform with Checkov Success
+        run: echo "Checkov completed successfully."
+
+      - name: Send Failure Notification
+        if: failure()
+        run: echo "The 'build' job failed."
+       
+      
+                      
+ 
+
+  terraform-job2:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.3   # Specify the desired Terraform version
+
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Format
+        run: terraform fmt
+        
+      - name: Echo
+        run: |
+          echo "${{ secrets.ACCESS_KEY }}"
+          echo "${{ secrets.SECRET_KEY}}"
